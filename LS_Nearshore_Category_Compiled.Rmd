@@ -1,0 +1,80 @@
+---
+title: "Nearshore to offshore comparisons 0-2m"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=8,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+<!----Chunk selecting data and filter <2 m, then creating means and standard deviation for every date at every category. ---->
+```{r, results='hide',echo=FALSE}
+sp <- d %>%
+  select(Category,Date,m,SpCond) %>%
+  filter(m<=2) %>%
+  na.omit(sp)
+sp_sum <- sp %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_SpCond=mean(SpCond,na.rm=TRUE),
+            sd_SpCond=sd(SpCond,na.rm=TRUE)) %>% 
+  ungroup() 
+turb <- d %>%
+  select(Category,Date,m,Turbidity) %>%
+  filter(m<=2) %>%
+  na.omit(turb)
+turb_sum <- turb %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_Turb=mean(Turbidity,na.rm=TRUE),
+            sd_Turb=sd(Turbidity,na.rm=TRUE)) %>% 
+  ungroup() 
+temp <- d %>%
+  select(Category,Date,m,Temp) %>%
+  filter(m<=2) %>%
+  na.omit(temp)
+temp_sum <- temp %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_Temp=mean(Temp,na.rm=TRUE),
+            sd_Temp=sd(Temp,na.rm=TRUE)) %>%
+  ungroup() 
+```
+Graphs on Specfic Conductance
+
+0-2m Profiles
+```{r}
+sp1 <- ggplot(sp_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_SpCond,color = Category)) +
+  geom_boxplot(data = sp_sum, aes(y = mn_SpCond), size = 2) +
+  labs(x="River Mouth to Offshore",y="0-2m Mean Spcific Conductance") +
+  theme(legend.position = "none")
+tb1 <- ggplot(turb_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_Turb,color = Category)) +
+  geom_boxplot(data = turb_sum, aes(y = mn_Turb), size = 2) +
+  labs(x="River Mouth to Offshore",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none")
+tm1 <- ggplot(temp_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_SpCond,color = Category)) +
+  geom_boxplot(data = temp_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="River Mouth to Offshore",y="0-2m Mean Temp") +
+  theme(legend.position = "none")
+gridExtra::grid.arrange(sp1,tb1,tm1, ncol=2)
+
+
+```
+
+
