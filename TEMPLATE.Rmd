@@ -1,0 +1,29 @@
+---
+######!!!!! DO NOT SAVE THIS AS TEMPLATE.Rmd ... GIVE IT A NEW NAME  !!!!!######
+######!!!!! Only edit next two (title, author) of the first 22 lines !!!!!######
+title: "Untitled"
+author: "XXX"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output: 
+  html_document:
+    theme: yeti
+    highlight: pygments
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=5,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- You can edit anything below here; repeat structure as needed ---->
+
+# EDIT THIS WITH FIRST SECTION HEADING TEXT
+EDIT THIS WITH REGULAR TEXT (if needed)
+
+```{r}
+# Put R code in chunks like this (delete this comment)
+```
+
