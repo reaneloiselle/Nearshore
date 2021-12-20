@@ -1,0 +1,90 @@
+---
+title: "Figuring things out"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=14,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+##Chunk on Temperature
+```{r, results='hide'}
+chla <- d %>%
+  select(Site,Date,m,Chla) %>%
+  filter(m<=2) %>%
+  na.omit(chla)
+ch_sum <- chla %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Chla=mean(Chla,na.rm=TRUE),
+            sd_Chla=sd(Chla,na.rm=TRUE)) %>%
+  ungroup() %>%
+  arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+ch_sum
+
+ch2 <- chla %>%
+  select(Site,Date,m,Chla) %>%
+  na.omit(ch2)
+ch2_sum <- ch2 %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Chla=mean(Chla,na.rm=TRUE),
+            sd_Chla=sd(Chla,na.rm=TRUE)) %>%
+  ungroup() %>%
+   arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+ch2_sum
+
+```
+##Graphs on Temperature
+##0-2m Profiles
+```{r}
+ggplot(ch_sum, aes(x = reorder(Site, -mn_Chla),y= mn_Chla,color = Site)) +
+  geom_boxplot(data = ch_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="0-2m Chlorophyll-a") +
+  theme(legend.position = "none") 
+
+ggplot(ch_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Chla,color = Site)) +
+  geom_boxplot(data = ch_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="0-2m Mean Chlorophyll-a") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE}
+ggplot(ch_sum, aes(x = reorder(Site, -mn_Chla),y= mn_Chla,color = Site)) +
+  geom_jitter(data = ch_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="0-2m Mean Chlorophyll-a") +
+  theme(legend.position = "none")
+
+ggplot(ch_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Chla,color = Site)) +
+  geom_jitter(data = ch_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="0-2m Mean Chlorophyll-a") +
+  theme(legend.position = "none")
+```
+##Full Profiles
+```{r, echo=FALSE}
+ggplot(ch2_sum, aes(x = reorder(Site, -mn_Chla),y= mn_Chla,color = Site)) +
+  geom_jitter(data = ch2_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="Mean Chlorophyll-a") +
+  theme(legend.position = "none")
+
+ggplot(ch2_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Chla,color = Site)) +
+  geom_jitter(data = ch2_sum, aes(y = mn_Chla), size = 2) +
+  labs(x="Sites",y="Mean Chlorophyll-a") +
+  theme(legend.position = "none")
+```

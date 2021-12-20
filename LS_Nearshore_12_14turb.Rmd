@@ -1,0 +1,84 @@
+---
+title: "Figuring things out"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=14,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+##Turbidity
+```{r, results='hide'}
+turb <- d %>%
+  select(Site,Date,m,Turbidity) %>%
+  filter(m<=2) %>%
+  na.omit(turb)
+turb_sum <- turb %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Turbidity=mean(Turbidity,na.rm=TRUE),
+            sd_Turbidity=sd(Turbidity,na.rm=TRUE)) %>%
+  ungroup() %>%
+  arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+turb_sum
+
+turb2 <- d %>%
+  select(Site,Date,m,Turbidity) %>%
+  na.omit(turb2)
+turb2_sum <- turb2 %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Turbidity=mean(Turbidity,na.rm=TRUE),
+            sd_Turbidity=sd(Turbidity,na.rm=TRUE)) %>%
+  ungroup() %>%
+   arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+turb2_sum
+
+```
+
+##Graphs on Turbidity
+##0-2m Profiles
+```{r, echo=FALSE}
+ggplot(turb_sum, aes(x = reorder(Site, -mn_Turbidity),y= mn_Turbidity,color = Site)) +
+  geom_jitter(data = turb_sum, aes(y = mn_Turbidity), size = 2) +
+  labs(x="Sites",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none") 
+
+ggplot(turb_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Turbidity,color = Site)) +
+  geom_jitter(data = turb_sum, aes(y = mn_Turbidity), size = 2) +
+  labs(x="Sites",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none") 
+```
+##Full Profiles
+```{r, echo=FALSE}
+ggplot(turb2_sum, aes(x = reorder(Site, -mn_Turbidity),y= mn_Turbidity,color = Site)) +
+  geom_jitter(data = turb2_sum, aes(y = mn_Turbidity), size = 2) +
+  labs(x="Sites",y="Mean Turbidity") +
+  theme(legend.position = "none") 
+
+ggplot(turb2_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_SpCond,color = Site)) +
+  geom_jitter(data = turb2_sum, aes(y = mn_Turbidity), size = 2) +
+  labs(x="Sites",y="Mean Turbidity") +
+  theme(legend.position = "none") 
+
+ggplot(turb_sum, aes(x = reorder(Site, -mn_Turbidity),y= mn_Turbidity,color = Site)) +
+  geom_boxplot(data = turb_sum, aes(y = mn_Turbidity), size = 2) +
+  labs(x="Sites",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none") 
+```

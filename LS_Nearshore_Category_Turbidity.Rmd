@@ -1,0 +1,75 @@
+---
+title: "Figuring things out"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=8,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+Chunk on Temperature
+```{r, results='hide'}
+turb <- d %>%
+  select(Category,Date,m,Turbidity) %>%
+  filter(m<=2) %>%
+  na.omit(turb)
+turb_sum <- turb %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_Turb=mean(Turbidity,na.rm=TRUE),
+            sd_Turb=sd(Turbidity,na.rm=TRUE)) %>% 
+  ungroup() 
+turb_sum
+
+tb2 <- d %>%
+  select(Category,Date,m,Turbidity) %>%
+  na.omit(tb2)
+tb2_sum <- tb2 %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_Turb=mean(Turbidity,na.rm=TRUE),
+            sd_Turb=sd(Turbidity,na.rm=TRUE)) %>%
+  ungroup()
+tb2_sum
+```
+Graphs on Temperature
+
+0-2m Profiles
+```{r}
+ggplot(turb_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_Turb,color = Category)) +
+  geom_boxplot(data = turb_sum, aes(y = mn_Turb), size = 2) +
+  labs(x="Location",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE}
+ggplot(turb_sum, aes(x = Category, y= mn_Turb,color = Category)) +
+  geom_jitter(data = turb_sum, aes(y = mn_Turb), size = 2) +
+  labs(x="Location",y="0-2m Mean Turbidity") +
+  theme(legend.position = "none")
+```
+
+Full Profiles
+
+```{r, echo=FALSE}
+ggplot(tb2_sum, aes(x = Category,y= mn_Turb,color = Category)) +
+  geom_jitter(data = tb2_sum, aes(y = mn_Turb), size = 2) +
+  labs(x="Location",y="Mean Trbidity") +
+  theme(legend.position = "none")
+```

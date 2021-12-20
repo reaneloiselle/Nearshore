@@ -1,0 +1,80 @@
+---
+title: "Figuring things out"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=8,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+Chunk on Specific Conductance
+```{r, results='hide'}
+sp <- d %>%
+  select(Category,Date,m,SpCond) %>%
+  filter(m<=2) %>%
+  na.omit(sp)
+sp_sum <- sp %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_SpCond=mean(SpCond,na.rm=TRUE),
+            sd_SpCond=sd(SpCond,na.rm=TRUE)) %>% 
+  ungroup() 
+sp_sum
+
+sp2 <- d %>%
+  select(Category,Date,m,SpCond) %>%
+  na.omit(sp2)
+sp2_sum <- sp2 %>%
+  group_by(Category,Date) %>%
+  summarize(n=n(),
+            mn_SpCond=mean(SpCond,na.rm=TRUE),
+            sd_SpCond=sd(SpCond,na.rm=TRUE)) %>%
+  ungroup()
+sp2_sum
+```
+Graphs on Specfic Conductance
+
+0-2m Profiles
+```{r}
+ggplot(sp_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_SpCond,color = Category)) +
+  geom_boxplot(data = sp_sum, aes(y = mn_SpCond), size = 2) +
+  labs(x="Location",y="0-2m Mean Spcific Conductance") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE}
+ggplot(sp_sum, aes(x = Category, y= mn_SpCond,color = Category)) +
+  geom_jitter(data = sp_sum, aes(y = mn_SpCond), size = 2) +
+  labs(x="Location",y="0-2m Mean Specific Conductance") +
+  theme(legend.position = "none")
+```
+
+Full Profiles
+
+```{r, echo=FALSE}
+ggplot(sp2_sum, aes(x = factor(Category,level = c('A', 'B', 'C')),y= mn_SpCond,color = Category)) +
+  geom_boxplot(data = sp_sum, aes(y = mn_SpCond), size = 2) +
+  labs(x="Location",y="Mean Spcific Conductance") +
+  theme(legend.position = "none")
+
+ggplot(sp2_sum, aes(x = Category,y= mn_SpCond,color = Category)) +
+  geom_jitter(data = sp2_sum, aes(y = mn_SpCond), size = 2) +
+  labs(x="Location",y="Mean Specific Conductance") +
+  theme(legend.position = "none")
+```

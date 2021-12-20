@@ -1,0 +1,90 @@
+---
+title: "Figuring things out"
+author: "Reane Loiselle"
+date: "`r format(Sys.time(), '%A, %d-%b-%y')`"
+output:
+  html_document:
+    theme: yeti
+    highlight: pygments
+  pdf_document: default
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE, results="hide"}
+## Generally you will not edit this chunk at all.
+knitr::opts_chunk$set(echo=TRUE,fig.width=14,fig.height=5,comment="#R>")
+library(tidyverse)
+library(lubridate)
+library(magrittr)
+```
+
+<!---- set working directory ---->
+```{r,echo=FALSE}
+d <- read_csv("LLO_Burke_TROLL_21.csv") %>%
+  mutate(Date=as.Date(Date,format="%m/%d/%y"))
+```
+
+##Chunk on Temperature
+```{r, results='hide'}
+temp <- d %>%
+  select(Site,Date,m,Temp) %>%
+  filter(m<=2) %>%
+  na.omit(temp)
+temp_sum <- temp %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Temp=mean(Temp,na.rm=TRUE),
+            sd_Temp=sd(Temp,na.rm=TRUE)) %>%
+  ungroup() %>%
+  arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+temp_sum
+
+tm2 <- temp %>%
+  select(Site,Date,m,Temp) %>%
+  na.omit(tm2)
+tm2_sum <- tm2 %>%
+  group_by(Site,Date) %>%
+  summarize(n=n(),
+            mn_Temp=mean(Temp,na.rm=TRUE),
+            sd_Temp=sd(Temp,na.rm=TRUE)) %>%
+  ungroup() %>%
+   arrange(factor(Site, levels = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")))
+tm2_sum
+
+```
+##Graphs on Temperature
+##0-2m Profiles
+```{r}
+ggplot(temp_sum, aes(x = reorder(Site, -mn_Temp),y= mn_Temp,color = Site)) +
+  geom_boxplot(data = temp_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="0-2m Temperature C") +
+  theme(legend.position = "none") 
+
+ggplot(temp_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_SpCond,color = Site)) +
+  geom_boxplot(data = temp_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="0-2m Mean Temp") +
+  theme(legend.position = "none")
+```
+
+```{r, echo=FALSE}
+ggplot(temp_sum, aes(x = reorder(Site, -mn_Temp),y= mn_SpCond,color = Site)) +
+  geom_jitter(data = temp_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="0-2m Mean Temperature") +
+  theme(legend.position = "none")
+
+ggplot(temp_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Temp,color = Site)) +
+  geom_jitter(data = temp_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="0-2m Mean Temperature") +
+  theme(legend.position = "none")
+```
+##Full Profiles
+```{r, echo=FALSE}
+ggplot(tm2_sum, aes(x = reorder(Site, -mn_Temp),y= mn_Temp,color = Site)) +
+  geom_jitter(data = tm2_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="Mean Temperature") +
+  theme(legend.position = "none")
+
+ggplot(tm2_sum, aes(x = factor(Site,level = c('WE1a', 'WE1b', 'AR2a', 'AR2b', 'BR3a', 'BR3b', 'BR3c',"FR4a","FR4b","FR4c","Bbay","LLO4","SBay","MB5a","MB5c","SCav","6a","6b","7a","7b","8a","8b","9a","CB10","CB11","10a","CB1","CB3","11a","11b","11c")),y= mn_Temp,color = Site)) +
+  geom_jitter(data = tm2_sum, aes(y = mn_Temp), size = 2) +
+  labs(x="Sites",y="Mean Temperature") +
+  theme(legend.position = "none")
+```
